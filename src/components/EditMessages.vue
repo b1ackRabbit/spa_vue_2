@@ -33,6 +33,7 @@ export default {
   data () {
     return {
       message: emptyForm,
+      error : null
     }
   },
   // mixins: [spaMixin],
@@ -51,10 +52,13 @@ export default {
 
     getMessage: function(messageId){
       this.$http.get("comments/" + messageId).then((response) => { 
-        if(!!response.body) {
-          this.message = response.body;
-          this.message.buttonText = "Edit Message";
+        if(!!response.body && response.body.success && response.body.success === true){
 
+            this.message = response.body;
+            this.message.buttonText = "Edit Message";
+
+        }else{
+          alert("Can't recive data from server");
         }
       }, (response) => {
         this.error = response;
@@ -77,7 +81,14 @@ export default {
     },
     sendNewMessage: function() {
       this.$http.post('comments', this.message).then((response) => { 
-        this.listReload();
+        if(!!response.body && response.body.hasOwnProperty('success')){
+          if(response.body.success !== true){
+            alert("Can't save this message");
+          }
+          this.listReload();
+        }else{
+          alert("Cant access the server");
+        }
       }, (response) => {
         this.error = response;
       });                    
@@ -86,7 +97,14 @@ export default {
     updateMessage: function(messageId){
       this.$http.put('comments' + "/"+messageId, { "author" : this.message.author, "text": this.message.text}).then(
         (response) => { 
-          this.listReload();
+          if(!!response.body && response.body.hasOwnProperty('success')){
+            if(response.body.success !== true){
+              alert("Can't save this message");
+            }
+            this.listReload();
+          }else{
+            alert("Something went wrong");
+          }
         }, (response) => {
           this.error = response;
         }

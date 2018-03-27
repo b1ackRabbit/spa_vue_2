@@ -27,7 +27,8 @@ export default {
   data () {
     return {
       messages : [],
-      showOne : false
+      showOne : false,
+      error : null
     }
   },
   components: {
@@ -67,24 +68,32 @@ export default {
     getMessages: function(messId) { 
 
       this.$http.get('comments' + (messId ? ('/' + messId) : '' )).then((response) => { 
-        if(!!response.body) {
-          var answer = response.body;
-          if(!messId){
-            console.log('g');
-            for (var messageNumber in answer){
-              if (answer.hasOwnProperty(messageNumber)) {
-                if(typeof messageNumber === "number" || !isNaN(parseInt(messageNumber)) && typeof parseInt(messageNumber) === "number"){
-                  answer[messageNumber].deleted = false;
-                  this.messages.push(answer[messageNumber]);
+        if(!!response.body && response.body.hasOwnProperty('success')){
+          if(response.body.success === true) {
+            var answer = response.body;
+            if(!messId){
+              for (var messageNumber in answer){
+                if (answer.hasOwnProperty(messageNumber)) {
+                  if(typeof messageNumber === "number" || !isNaN(parseInt(messageNumber)) && typeof parseInt(messageNumber) === "number"){
+                    answer[messageNumber].deleted = false;
+                    this.messages.push(answer[messageNumber]);
+                  }
                 }
               }
+            }else{
+              answer.deleted = false;
+              this.messages.push(answer);
+              this.showOne = true;
             }
           }else{
-            answer.deleted = false;
-            this.messages.push(answer);
-            this.showOne = true;
+            if(!!messId){
+              alert("there is no message with id="+messId);
+              this.$router.push('/messages');
+            }
           }
 
+        }else{
+          alert("Can't recive data from server");
         }
       }, (response) => {
         this.error = response;

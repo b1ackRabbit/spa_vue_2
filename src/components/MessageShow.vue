@@ -33,7 +33,7 @@ export default {
   // name: 'Message',
   data () {
     return {
-      deleted: false,
+      deleted: false
     }
   },
   // },
@@ -42,7 +42,6 @@ export default {
   },
   methods: {
     messageDeletedCallback: function(){
-      console.log(this.message);
       this.message.deleted = true;
     }
   }

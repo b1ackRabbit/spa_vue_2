@@ -21,14 +21,23 @@ export default {
   name: 'commands',
   data () {
     return {
-      eventBus : EventBus
+      eventBus : EventBus,
+      error : null
     }
   },
   methods: {
     deleteMessage: function(messageId){
 	    this.$http.delete("comments/"+messageId).then((response) => { 
-	    	this.$emit('messageDeletedEvent',messageId);
-	    	// this.$router.push(this.$route.path);
+	    	if(!!response.body  && response.body.hasOwnProperty('success')){ 
+	    		if(response.body.success === true){
+			    	this.$emit('messageDeletedEvent',messageId);
+			    }else{
+			    	alert("Server can't delete this message");
+			    	this.$router.push('/messages');
+			    }	    		
+	    	}else{
+	    		alert("Something went wrong");
+	    	}
 	    }, (response) => {
 	        this.error = response;
 	    }); 
